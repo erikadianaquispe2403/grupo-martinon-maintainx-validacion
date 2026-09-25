@@ -349,7 +349,7 @@
       </div>
 
       <div class="item" data-item>
-        <p class="q">Q2. Existe un SOP documentado de cómo reportar una falla (huésped → recepción/ama de llaves → ticket en MaintainX).</p>
+        <p class="q">Q2. Existe el SOP-MT-01 firmado y el equipo lo conoce y lo aplica (no solo que exista el documento).</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
@@ -366,6 +366,18 @@
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
 
+      <div class="item" data-item>
+        <p class="q">Q5. Ama de Llaves reporta cada OT de habitación con su propio usuario asignado (no uno compartido).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q6. Cocina/A&B/áreas comunes reporta directo en MaintainX en horario 9:00 a.m.–6:00 p.m., y fuera de ese horario el canal de radio funciona con el supervisor/técnico de turno cargando la OT.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
     </div>
   </div>
 
@@ -375,31 +387,43 @@
     <div class="card-body">
 
       <div class="item" data-item>
-        <p class="q">Q5. Las familias de equipo (Aire Acondicionado, Jacuzzi, Teléfono, etc.) están estandarizadas y son las mismas que usan las demás propiedades.</p>
+        <p class="q">Q7. Las familias de equipo (Aire Acondicionado, Jacuzzi, Teléfono, etc.) están estandarizadas y son las mismas que usan las demás propiedades.</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
 
       <div class="item" data-item>
-        <p class="q">Q6. El sistema identifica automáticamente cuándo una misma habitación+familia se repite (sin depender de análisis manual externo).</p>
+        <p class="q">Q8. El sistema identifica automáticamente cuándo una misma habitación+familia se repite (sin depender de análisis manual externo).</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
 
       <div class="item" data-item>
-        <p class="q">Q7. Existen niveles de prioridad configurados (crítico/urgente/seguimiento) con SLA de tiempo de respuesta asociado.</p>
+        <p class="q">Q9. Existen niveles de prioridad configurados (crítico/urgente/seguimiento) con SLA de tiempo de respuesta asociado.</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
 
       <div class="item" data-item>
-        <p class="q">Q8. Es obligatorio adjuntar evidencia fotográfica al cerrar un ticket.</p>
+        <p class="q">Q10. Es obligatorio adjuntar evidencia fotográfica al cerrar un ticket.</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
 
       <div class="item" data-item>
-        <p class="q">Q9. Existe un módulo de mantenimiento preventivo activo (no solo tickets reactivos de falla).</p>
+        <p class="q">Q11. Existe un módulo de mantenimiento preventivo activo (no solo tickets reactivos de falla).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q12. La integración Tellme → MaintainX tiene un responsable designado que valide que cada reporte de huésped generó su OT correspondiente (sin pérdidas por falla de sincronización).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q13. El SLA de MTTR ≤30 min para solicitudes vía Tellme tiene claro desde qué momento se mide (timestamp de Tellme vs. creación de la OT en MaintainX).</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
@@ -413,19 +437,19 @@
     <div class="card-body">
 
       <div class="item" data-item>
-        <p class="q">Q10. Cada técnico de mantenimiento tiene un dispositivo (tablet/teléfono) asignado para usar la app, sin depender de compartir equipos.</p>
+        <p class="q">Q14. Cada técnico de mantenimiento tiene un dispositivo (tablet/teléfono) asignado para usar la app, sin depender de compartir equipos.</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
 
       <div class="item" data-item>
-        <p class="q">Q11. Hay cobertura de wifi/datos confiable en las zonas de trabajo (cuartos de máquinas, azoteas, sótanos).</p>
+        <p class="q">Q15. Hay cobertura de wifi/datos confiable en las zonas de trabajo (cuartos de máquinas, azoteas, sótanos).</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
 
       <div class="item" data-item>
-        <p class="q">Q12. El inventario de activos (unidades de AC, jacuzzis, TVs, etc.) está cargado en el sistema con su ubicación exacta por habitación.</p>
+        <p class="q">Q16. El inventario de activos (unidades de AC, jacuzzis, TVs, etc.) está cargado en el sistema con su ubicación exacta por habitación.</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
@@ -439,7 +463,7 @@
     <div class="card-body">
 
       <div class="item" data-item>
-        <p class="q">Q13. Estimado de qué % de las fallas reportadas en la propiedad entra realmente por MaintainX (vs. WhatsApp / llamada / papel).</p>
+        <p class="q">Q17. Estimado de qué % de las fallas reportadas en la propiedad entra realmente por MaintainX (vs. WhatsApp / llamada / papel).</p>
         <div class="pct-field">
           <input type="range" min="0" max="100" value="50" class="pct-slider">
           <span class="pct-val">50%</span>
@@ -448,19 +472,31 @@
       </div>
 
       <div class="item" data-item>
-        <p class="q">Q14. Los técnicos cierran el ticket con causa raíz documentada (no solo "resuelto").</p>
+        <p class="q">Q18. Los técnicos cierran el ticket con causa raíz documentada, y existe el proceso de reapertura por no conformidad (se reabre la misma OT, no se crea una nueva).</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
 
       <div class="item" data-item>
-        <p class="q">Q15. Hay revisión gerencial semanal de los casos repetitivos, con seguimiento visible.</p>
+        <p class="q">Q19. Hay revisión gerencial semanal de los casos repetitivos, con seguimiento visible.</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
 
       <div class="item" data-item>
-        <p class="q">Q16. La dependencia pendiente de sincronización con Tell Me está resuelta o tiene fecha de resolución.</p>
+        <p class="q">Q20. El costo de cada OT (materiales y repuestos) queda cuantificado en MaintainX y se consolida mensualmente.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q21. Se cumplen los indicadores del SOP-MT-01: ≥90% de OT registradas en MaintainX, MTTR ≤30 min en solicitudes vía Tellme, ≥90% de OT cerradas con evidencia+responsable+costo.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q22. Hay un responsable claro de auditar que la integración Tellme–MaintainX no pierda reportes (más allá de que la sincronización exista).</p>
         <div class="options"></div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
@@ -829,11 +865,11 @@ function buildReportHTML(entry){
     const items = entry.respuestas.filter(r => r.seccion === sec);
     let rows = "";
     items.forEach(r => {
-      const esQ13 = /^Q13\./.test(r.pregunta);
+      const esQ17 = /^Q17\./.test(r.pregunta);
       rows += `
         <tr>
           <td style="padding:8px;border:1px solid #D9D3CC;">${r.pregunta}</td>
-          <td style="padding:8px;border:1px solid #D9D3CC;text-align:center;white-space:nowrap;font-weight:bold;color:#1F3864;">${valorLabel(r.valor, esQ13, entry)}</td>
+          <td style="padding:8px;border:1px solid #D9D3CC;text-align:center;white-space:nowrap;font-weight:bold;color:#1F3864;">${valorLabel(r.valor, esQ17, entry)}</td>
         </tr>
         <tr>
           <td colspan="2" style="padding:6px 8px;border:1px solid #D9D3CC;font-size:.85em;color:#6B7280;font-style:italic;">
