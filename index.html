@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MaintainX — Ficha de Validación de Campo</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --navy:#1F3864;
+    --navy-dark:#152648;
+    --gold:#B08D3E;
+    --gold-light:#D4B876;
+    --beige:#EDE9E6;
+    --white:#FFFFFF;
+    --red:#B3261E;
+    --green:#2E7D46;
+    --grey:#6B7280;
+    --border:#D9D3CC;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--beige);
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:#2A2A2A;
+    padding-bottom:60px;
+  }
+  header.top{
+    background:var(--navy);
+    color:var(--white);
+    padding:20px 20px 18px;
+    border-bottom:4px solid var(--gold);
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  header.top img.logo{
+    height:52px;
+    width:52px;
+    object-fit:contain;
+    flex-shrink:0;
+  }
+  header.top .title-block{flex:1;}
+  header.top .eyebrow{
+    font-size:.7rem;
+    font-weight:600;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:var(--gold-light);
+    margin:0 0 5px;
+  }
+  header.top h1{
+    font-size:1.28rem;
+    letter-spacing:0;
+    margin:0 0 6px;
+    font-weight:700;
+    line-height:1.2;
+  }
+  header.top p{
+    margin:0;
+    font-size:.82rem;
+    line-height:1.4;
+    color:rgba(255,255,255,.78);
+    font-weight:400;
+    max-width:520px;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:18px;}
+  .card{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:4px;
+    margin-bottom:16px;
+    overflow:hidden;
+  }
+  .card-head{
+    background:var(--beige);
+    padding:12px 16px;
+    border-bottom:2px solid var(--gold);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .card-head h2{
+    font-size:1rem;
+    margin:0;
+    color:var(--navy);
+    font-weight:700;
+  }
+  .card-head .score{
+    font-size:.85rem;
+    font-weight:700;
+    color:var(--navy);
+    min-width:48px;
+    text-align:right;
+  }
+  .card-body{padding:14px 16px;}
+  .meta-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  @media(max-width:520px){.meta-grid{grid-template-columns:1fr;}}
+  label.field-label{
+    display:block;
+    font-size:.78rem;
+    color:var(--grey);
+    margin-bottom:4px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  select, input[type=text], input[type=date], textarea{
+    width:100%;
+    padding:8px 10px;
+    border:1px solid var(--border);
+    border-radius:3px;
+    font-family:inherit;
+    font-size:.95rem;
+    background:var(--white);
+  }
+  textarea{resize:vertical;min-height:54px;}
+  .item{
+    padding:12px 0;
+    border-top:1px solid var(--border);
+  }
+  .item:first-child{border-top:none;padding-top:0;}
+  .item p.q{
+    margin:0 0 8px;
+    font-size:.92rem;
+    line-height:1.35;
+  }
+  .options{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-bottom:8px;
+  }
+  .opt{
+    flex:1 1 auto;
+    min-width:78px;
+    text-align:center;
+    padding:7px 4px;
+    border:1px solid var(--border);
+    border-radius:3px;
+    cursor:pointer;
+    font-size:.78rem;
+    color:var(--grey);
+    user-select:none;
+    transition:all .12s;
+  }
+  .opt input{display:none;}
+  .opt.cumple.sel{background:var(--green);border-color:var(--green);color:#fff;}
+  .opt.parcial.sel{background:var(--gold);border-color:var(--gold);color:#fff;}
+  .opt.nocumple.sel{background:var(--red);border-color:var(--red);color:#fff;}
+  .opt.na.sel{background:var(--grey);border-color:var(--grey);color:#fff;}
+  .item textarea.comentario{font-size:.85rem;}
+  .pct-field{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .pct-field input[type=range]{flex:1;}
+  .pct-field .pct-val{
+    min-width:44px;
+    font-weight:700;
+    color:var(--navy);
+    text-align:right;
+  }
+  .summary{
+    background:var(--navy);
+    color:var(--white);
+    border-radius:4px;
+    padding:16px;
+    margin-bottom:18px;
+  }
+  .summary h2{
+    font-size:1.05rem;
+    margin:0 0 10px;
+    font-weight:700;
+  }
+  .summary-row{
+    display:flex;
+    justify-content:space-between;
+    padding:5px 0;
+    font-size:.88rem;
+    border-bottom:1px solid rgba(255,255,255,.15);
+  }
+  .summary-row:last-child{border-bottom:none;}
+  .summary-row .val{font-weight:700;color:var(--gold-light);}
+  .overall{
+    text-align:center;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid rgba(255,255,255,.25);
+  }
+  .overall .big{font-size:2rem;font-weight:700;color:var(--gold-light);}
+  .badge{
+    display:inline-block;
+    font-size:.72rem;
+    padding:2px 10px;
+    border-radius:10px;
+    margin-top:4px;
+  }
+  .badge.green{background:#2E7D46;}
+  .badge.yellow{background:var(--gold);}
+  .badge.red{background:var(--red);}
+  button.primary{
+    width:100%;
+    padding:14px;
+    background:var(--gold);
+    color:var(--white);
+    border:none;
+    border-radius:4px;
+    font-size:1rem;
+    font-weight:700;
+    letter-spacing:.02em;
+    cursor:pointer;
+    margin-top:6px;
+  }
+  button.primary:active{background:var(--navy);}
+  button.secondary{
+    width:100%;
+    padding:11px;
+    background:transparent;
+    color:var(--navy);
+    border:1px solid var(--navy);
+    border-radius:4px;
+    font-size:.9rem;
+    cursor:pointer;
+    margin-top:8px;
+  }
+  .status-msg{
+    text-align:center;
+    font-size:.85rem;
+    margin-top:10px;
+    padding:8px;
+    border-radius:3px;
+    display:none;
+  }
+  .status-msg.show{display:block;}
+  .status-msg.ok{background:#E4F3E8;color:var(--green);}
+  .status-msg.err{background:#FBE8E7;color:var(--red);}
+  .status-msg.local{background:#FDF3E0;color:var(--gold);}
+  .entries-list{margin-top:26px;}
+  .entries-list h3{
+    font-size:.95rem;
+    color:var(--navy);
+    border-bottom:2px solid var(--gold);
+    padding-bottom:6px;
+  }
+  .entry-row{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    font-size:.82rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .entry-row .pill{
+    background:var(--beige);
+    color:var(--navy);
+    padding:2px 8px;
+    border-radius:10px;
+    font-size:.72rem;
+    font-weight:700;
+  }
+  footer.note{
+    text-align:center;
+    font-size:.72rem;
+    color:var(--grey);
+    padding:20px;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <img class="logo" src="data:image/png;base64,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" alt="Grupo Martinón">
+  <div class="title-block">
+    <p class="eyebrow">Grupo Martinón · Dirección Corporativa de Implementación y Procesos</p>
+    <h1>Ficha de Validación de Campo — MaintainX</h1>
+    <p>Registro de campo por propiedad: ejecución operativa, funcionalidad del sistema, infraestructura/equipamiento y adopción operativa.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <div class="card-head"><h2>Datos generales</h2></div>
+    <div class="card-body">
+      <div class="meta-grid">
+        <div>
+          <label class="field-label">Hotel</label>
+          <select id="hotel">
+            <option value="">Seleccionar…</option>
+            <option value="BREPC">BREPC — Breathless Punta Cana</option>
+            <option value="DROPC">DROPC — Dreams Onyx Punta Cana</option>
+            <option value="DRFPC">DRFPC — Dreams Flora Punta Cana</option>
+            <option value="DRRPC">DRRPC — Dreams Royal Beach Punta Cana</option>
+            <option value="SERPC">SERPC — Secrets Royal Beach Punta Cana</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Fecha</label>
+          <input type="date" id="fecha">
+        </div>
+        <div>
+          <label class="field-label">Evaluador</label>
+          <input type="text" id="evaluador" placeholder="Nombre">
+        </div>
+        <div>
+          <label class="field-label">Responsable de mantenimiento (propiedad)</label>
+          <input type="text" id="responsable_prop" placeholder="Nombre">
+        </div>
+        <div>
+          <label class="field-label">Perfil entrevistado</label>
+          <select id="perfil_entrevistado">
+            <option value="">Seleccionar…</option>
+            <option value="Jefe/Gerente de Mantenimiento">Jefe/Gerente de Mantenimiento</option>
+            <option value="Técnico de Mantenimiento">Técnico de Mantenimiento</option>
+            <option value="Director General / Gerente de Operaciones">Director General / Gerente de Operaciones</option>
+            <option value="IT / Sistemas">IT / Sistemas</option>
+            <option value="Ama de Llaves / Housekeeping">Ama de Llaves / Housekeeping</option>
+            <option value="Recepción / Guest Services">Recepción / Guest Services</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+        <div id="perfil_otro_wrap" style="display:none;">
+          <label class="field-label">Especificar perfil</label>
+          <input type="text" id="perfil_otro" placeholder="Describe el perfil">
+        </div>
+      </div>
+      <p style="font-size:.78rem;color:var(--grey);margin:10px 0 0;">Se recomienda llenar una ficha por cada perfil entrevistado en el hotel, para tener una visión completa.</p>
+    </div>
+  </div>
+
+  <!-- 1. Ejecución Operativa de la Implementación -->
+  <div class="card" data-section="ejecucion">
+    <div class="card-head"><h2>1. Ejecución Operativa de la Implementación</h2><div class="score" data-score-for="ejecucion">—</div></div>
+    <div class="card-body">
+
+      <div class="item" data-item>
+        <p class="q">Q1. El equipo de mantenimiento recibió capacitación formal en MaintainX (no solo handoff informal).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q2. Existe un SOP documentado de cómo reportar una falla (huésped → recepción/ama de llaves → ticket en MaintainX).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q3. Hay un responsable designado de dar seguimiento diario a los tickets abiertos de esta propiedad.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q4. Existe una fecha de "go-live" formal y conocida por el equipo (no un inicio informal/gradual).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. Funcionalidad del Sistema -->
+  <div class="card" data-section="funcionalidad">
+    <div class="card-head"><h2>2. Funcionalidad del Sistema</h2><div class="score" data-score-for="funcionalidad">—</div></div>
+    <div class="card-body">
+
+      <div class="item" data-item>
+        <p class="q">Q5. Las familias de equipo (Aire Acondicionado, Jacuzzi, Teléfono, etc.) están estandarizadas y son las mismas que usan las demás propiedades.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q6. El sistema identifica automáticamente cuándo una misma habitación+familia se repite (sin depender de análisis manual externo).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q7. Existen niveles de prioridad configurados (crítico/urgente/seguimiento) con SLA de tiempo de respuesta asociado.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q8. Es obligatorio adjuntar evidencia fotográfica al cerrar un ticket.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q9. Existe un módulo de mantenimiento preventivo activo (no solo tickets reactivos de falla).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3. Infraestructura y Equipamiento -->
+  <div class="card" data-section="infraestructura">
+    <div class="card-head"><h2>3. Infraestructura y Equipamiento</h2><div class="score" data-score-for="infraestructura">—</div></div>
+    <div class="card-body">
+
+      <div class="item" data-item>
+        <p class="q">Q10. Cada técnico de mantenimiento tiene un dispositivo (tablet/teléfono) asignado para usar la app, sin depender de compartir equipos.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q11. Hay cobertura de wifi/datos confiable en las zonas de trabajo (cuartos de máquinas, azoteas, sótanos).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q12. El inventario de activos (unidades de AC, jacuzzis, TVs, etc.) está cargado en el sistema con su ubicación exacta por habitación.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 4. Adopción Operativa -->
+  <div class="card" data-section="adopcion">
+    <div class="card-head"><h2>4. Adopción Operativa</h2><div class="score" data-score-for="adopcion">—</div></div>
+    <div class="card-body">
+
+      <div class="item" data-item>
+        <p class="q">Q13. Estimado de qué % de las fallas reportadas en la propiedad entra realmente por MaintainX (vs. WhatsApp / llamada / papel).</p>
+        <div class="pct-field">
+          <input type="range" min="0" max="100" value="50" class="pct-slider">
+          <span class="pct-val">50%</span>
+        </div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q14. Los técnicos cierran el ticket con causa raíz documentada (no solo "resuelto").</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q15. Hay revisión gerencial semanal de los casos repetitivos, con seguimiento visible.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">Q16. La dependencia pendiente de sincronización con Tell Me está resuelta o tiene fecha de resolución.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Hallazgos generales y plan de acción</h2></div>
+    <div class="card-body">
+      <label class="field-label">Hallazgos clave de la visita</label>
+      <textarea id="hallazgos" style="min-height:70px;margin-bottom:12px;" placeholder="Ej. Las fallas de aire acondicionado se cierran sin registrar causa raíz…"></textarea>
+      <label class="field-label">Plan de acción propuesto</label>
+      <textarea id="plan_accion" style="min-height:70px;" placeholder="Ej. Definir checklist de cierre obligatorio con causa raíz…"></textarea>
+    </div>
+  </div>
+
+  <div class="summary">
+    <h2>Resumen de cumplimiento</h2>
+    <div class="summary-row"><span>1. Ejecución Operativa de la Implementación</span><span class="val" id="sum-ejecucion">—</span></div>
+    <div class="summary-row"><span>2. Funcionalidad del Sistema</span><span class="val" id="sum-funcionalidad">—</span></div>
+    <div class="summary-row"><span>3. Infraestructura y Equipamiento</span><span class="val" id="sum-infraestructura">—</span></div>
+    <div class="summary-row"><span>4. Adopción Operativa</span><span class="val" id="sum-adopcion">—</span></div>
+    <div class="overall">
+      <div class="big" id="overall-pct">—</div>
+      <div class="badge" id="overall-badge">Sin datos</div>
+    </div>
+  </div>
+
+  <button class="primary" id="btn-guardar">Guardar ficha</button>
+  <div class="status-msg" id="status-msg"></div>
+
+  <div class="card" id="report-actions" style="display:none;margin-top:14px;">
+    <div class="card-head"><h2>Informe de la última ficha guardada</h2></div>
+    <div class="card-body">
+      <p id="report-actions-label" style="font-size:.85rem;color:var(--grey);margin:0 0 10px;"></p>
+      <button class="secondary" id="btn-pdf" style="margin-top:0;">📄 Descargar PDF</button>
+      <button class="secondary" id="btn-word">📝 Descargar Word (editable)</button>
+    </div>
+  </div>
+
+  <div class="entries-list" id="hotel-avg-section">
+    <h3>Promedio de Implementación por Hotel</h3>
+    <p style="font-size:.78rem;color:var(--grey);margin-top:-6px;">
+      Promedia todas las fichas guardadas (de todos los perfiles y evaluadores) por propiedad.
+      <span id="hotel-avg-source"></span>
+    </p>
+    <div id="hotel-avg-container"></div>
+  </div>
+
+  <div class="entries-list">
+    <h3>Fichas guardadas en este dispositivo</h3>
+    <div id="entries-container"></div>
+  </div>
+
+</div>
+
+<footer class="note">
+  Grupo Martinón · Ficha de campo MaintainX · Metodología: Cumple 100% / Parcial 50% / No cumple 0% / No aplica se excluye del cálculo.<br>
+  Mantén una sola pestaña abierta a la vez para evitar conflictos de sincronización con Supabase.
+</footer>
+
+<script>
+// =========================================================================
+// CONFIGURACIÓN SUPABASE — completar antes de publicar en GitHub Pages.
+// Usar el mismo proyecto que las demás apps de campo (wwnuiriqjbiaggmdrlrk).
+// Crear antes la tabla `maintainx_validation_entries` (ver esquema sugerido
+// al final de este bloque de comentarios).
+// =========================================================================
+const SUPABASE_URL = "https://wwnuiriqjbiaggmdrlrk.supabase.co"; // confirmar
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3bnVpcmlxamJpYWdnbWRybHJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5OTY5NTgsImV4cCI6MjEwMjU3Mjk1OH0.rNehaDSqpjnb5XvJ-KXfnVU6bGJQzYDKnX54w6ISrh0";
+const SUPABASE_TABLE = "maintainx_validation_entries";
+
+let supabaseClient = null;
+try {
+  if (window.supabase && SUPABASE_ANON_KEY !== "PEGAR_AQUI_LA_ANON_KEY") {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+} catch (e) { console.warn("Supabase no inicializado:", e); }
+
+/* Esquema sugerido para `maintainx_validation_entries` en Supabase:
+   id            uuid, default gen_random_uuid(), primary key
+   created_at    timestamptz, default now()
+   hotel         text
+   fecha         date
+   evaluador     text
+   responsable_propiedad text
+   perfil_entrevistado text
+   respuestas    jsonb   -- array de {seccion, pregunta, valor, comentario}
+   pct_adopcion  int
+   hallazgos     text
+   plan_accion   text
+   score_ejecucion      numeric
+   score_funcionalidad  numeric
+   score_infraestructura numeric
+   score_adopcion       numeric
+   score_general        numeric
+*/
+
+const OPTIONS = [
+  {key:"cumple", label:"Cumple", val:100},
+  {key:"parcial", label:"Parcial", val:50},
+  {key:"nocumple", label:"No cumple", val:0},
+  {key:"na", label:"No aplica", val:null},
+];
+
+// Build option buttons for every item that has an .options div (skip the % slider item)
+document.querySelectorAll(".item .options").forEach(optDiv => {
+  OPTIONS.forEach(o => {
+    const btn = document.createElement("div");
+    btn.className = "opt " + o.key;
+    btn.dataset.val = o.val === null ? "na" : o.val;
+    btn.textContent = o.label;
+    btn.addEventListener("click", () => {
+      optDiv.querySelectorAll(".opt").forEach(b => b.classList.remove("sel"));
+      btn.classList.add("sel");
+      recalcScores();
+    });
+    optDiv.appendChild(btn);
+  });
+});
+
+// % slider live label
+document.querySelectorAll(".pct-slider").forEach(sl => {
+  const label = sl.parentElement.querySelector(".pct-val");
+  sl.addEventListener("input", () => { label.textContent = sl.value + "%"; });
+});
+
+document.getElementById("fecha").valueAsDate = new Date();
+
+const perfilSelect = document.getElementById("perfil_entrevistado");
+const perfilOtroWrap = document.getElementById("perfil_otro_wrap");
+perfilSelect.addEventListener("change", () => {
+  perfilOtroWrap.style.display = perfilSelect.value === "Otros" ? "block" : "none";
+  if (perfilSelect.value !== "Otros") document.getElementById("perfil_otro").value = "";
+});
+
+function sectionScore(sectionEl){
+  const items = sectionEl.querySelectorAll(".item[data-item]");
+  let sum = 0, count = 0;
+  items.forEach(it => {
+    const sel = it.querySelector(".opt.sel");
+    if (sel && sel.dataset.val !== "na") {
+      sum += parseFloat(sel.dataset.val);
+      count++;
+    }
+  });
+  if (count === 0) return null;
+  return Math.round(sum / count);
+}
+
+function badgeFor(pct){
+  if (pct === null) return {cls:"", txt:"Sin datos"};
+  if (pct >= 90) return {cls:"green", txt:"Consolidada"};
+  if (pct >= 71) return {cls:"yellow", txt:"Requiere Seguimiento"};
+  return {cls:"red", txt:"Requiere Intervención Prioritaria"};
+}
+
+function recalcScores(){
+  const sections = ["ejecucion","funcionalidad","infraestructura","adopcion"];
+  const scores = {};
+  sections.forEach(s => {
+    const el = document.querySelector(`.card[data-section="${s}"]`);
+    const sc = sectionScore(el);
+    scores[s] = sc;
+    document.querySelector(`[data-score-for="${s}"]`).textContent = sc === null ? "—" : sc + "%";
+    document.getElementById("sum-" + s).textContent = sc === null ? "—" : sc + "%";
+  });
+  const valid = sections.map(s => scores[s]).filter(v => v !== null);
+  const overall = valid.length ? Math.round(valid.reduce((a,b)=>a+b,0)/valid.length) : null;
+  document.getElementById("overall-pct").textContent = overall === null ? "—" : overall + "%";
+  const b = badgeFor(overall);
+  const badgeEl = document.getElementById("overall-badge");
+  badgeEl.className = "badge " + b.cls;
+  badgeEl.textContent = b.txt;
+  return scores;
+}
+
+function collectRespuestas(){
+  const respuestas = [];
+  document.querySelectorAll(".card[data-section]").forEach(card => {
+    const seccion = card.dataset.section;
+    card.querySelectorAll(".item[data-item]").forEach(it => {
+      const q = it.querySelector(".q").textContent;
+      const sel = it.querySelector(".opt.sel");
+      const comentario = it.querySelector(".comentario").value;
+      respuestas.push({
+        seccion, pregunta: q,
+        valor: sel ? sel.classList[1] : null,
+        comentario
+      });
+    });
+  });
+  return respuestas;
+}
+
+function showStatus(msg, type){
+  const el = document.getElementById("status-msg");
+  el.textContent = msg;
+  el.className = "status-msg show " + type;
+}
+
+function renderEntries(){
+  const container = document.getElementById("entries-container");
+  const entries = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
+  container.innerHTML = "";
+  if (!entries.length){
+    container.innerHTML = '<p style="font-size:.85rem;color:var(--grey);">Aún no hay fichas guardadas.</p>';
+    return;
+  }
+  entries.slice().reverse().forEach(e => {
+    const row = document.createElement("div");
+    row.className = "entry-row";
+    row.innerHTML = `<span>${e.hotel} · ${e.perfil_entrevistado || 's/perfil'} · ${e.fecha}</span><span class="pill">${e.score_general !== null ? e.score_general + '%' : 's/d'}</span>`;
+    container.appendChild(row);
+  });
+}
+
+const HOTEL_NAMES = {
+  BREPC: "Breathless Punta Cana",
+  DROPC: "Dreams Onyx Punta Cana",
+  DRFPC: "Dreams Flora Punta Cana",
+  DRRPC: "Dreams Royal Beach Punta Cana",
+  SERPC: "Secrets Royal Beach Punta Cana"
+};
+const HOTEL_ORDER = ["BREPC","DROPC","DRFPC","DRRPC","SERPC"];
+
+function renderHotelAverages(rows, source){
+  const container = document.getElementById("hotel-avg-container");
+  document.getElementById("hotel-avg-source").textContent =
+    source === "supabase" ? "Fuente: Supabase (todos los dispositivos)." : "Fuente: solo este dispositivo (conecta Supabase para ver todas las evaluaciones).";
+
+  const byHotel = {};
+  HOTEL_ORDER.forEach(h => byHotel[h] = {sum:0, count:0});
+  rows.forEach(r => {
+    if (!byHotel[r.hotel]) return;
+    if (r.score_general === null || r.score_general === undefined) return;
+    byHotel[r.hotel].sum += Number(r.score_general);
+    byHotel[r.hotel].count += 1;
+  });
+
+  container.innerHTML = "";
+  HOTEL_ORDER.forEach(h => {
+    const d = byHotel[h];
+    const avg = d.count ? Math.round(d.sum / d.count) : null;
+    const b = badgeFor(avg);
+    const row = document.createElement("div");
+    row.className = "entry-row";
+    row.innerHTML = `
+      <span>${h} — ${HOTEL_NAMES[h]}<br><span style="font-size:.72rem;color:var(--grey);">${d.count} ficha(s)</span></span>
+      <span style="text-align:right;">
+        <span class="pill" style="display:block;margin-bottom:3px;">${avg === null ? 's/d' : avg + '%'}</span>
+        <span class="badge ${b.cls}" style="font-size:.65rem;">${b.txt}</span>
+      </span>`;
+    container.appendChild(row);
+  });
+}
+
+async function loadHotelAverages(){
+  if (supabaseClient){
+    try {
+      const { data, error } = await supabaseClient.from(SUPABASE_TABLE).select("hotel, score_general");
+      if (error) throw error;
+      renderHotelAverages(data || [], "supabase");
+      return;
+    } catch (err){
+      console.warn("No se pudo leer Supabase para promedios, usando datos locales:", err);
+    }
+  }
+  const local = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
+  renderHotelAverages(local, "local");
+}
+
+document.getElementById("btn-guardar").addEventListener("click", async () => {
+  const hotel = document.getElementById("hotel").value;
+  const fecha = document.getElementById("fecha").value;
+  const perfilSel = document.getElementById("perfil_entrevistado").value;
+  if (!hotel || !fecha){
+    showStatus("Selecciona hotel y fecha antes de guardar.", "err");
+    return;
+  }
+  if (!perfilSel){
+    showStatus("Selecciona el perfil entrevistado antes de guardar.", "err");
+    return;
+  }
+  if (perfilSel === "Otros" && !document.getElementById("perfil_otro").value.trim()){
+    showStatus("Especifica el perfil entrevistado en el cuadro de texto.", "err");
+    return;
+  }
+  const perfil_entrevistado = perfilSel === "Otros"
+    ? document.getElementById("perfil_otro").value.trim()
+    : perfilSel;
+  const scores = recalcScores();
+  const validScores = Object.values(scores).filter(v => v !== null);
+  const overall = validScores.length ? Math.round(validScores.reduce((a,b)=>a+b,0)/validScores.length) : null;
+
+  const entry = {
+    hotel,
+    fecha,
+    evaluador: document.getElementById("evaluador").value,
+    responsable_propiedad: document.getElementById("responsable_prop").value,
+    perfil_entrevistado,
+    respuestas: collectRespuestas(),
+    pct_adopcion: parseInt(document.querySelector(".pct-slider").value, 10),
+    hallazgos: document.getElementById("hallazgos").value,
+    plan_accion: document.getElementById("plan_accion").value,
+    score_ejecucion: scores.ejecucion,
+    score_funcionalidad: scores.funcionalidad,
+    score_infraestructura: scores.infraestructura,
+    score_adopcion: scores.adopcion,
+    score_general: overall,
+    created_at: new Date().toISOString()
+  };
+
+  // Guardar siempre localmente primero (resiliencia offline)
+  const local = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
+  local.push(entry);
+  localStorage.setItem("maintainx_entries", JSON.stringify(local));
+  renderEntries();
+
+  if (supabaseClient){
+    try {
+      const { error } = await supabaseClient.from(SUPABASE_TABLE).insert([entry]);
+      if (error) throw error;
+      showStatus("Ficha guardada y sincronizada con Supabase.", "ok");
+    } catch (err){
+      console.error(err);
+      showStatus("Guardada localmente. No se pudo sincronizar con Supabase (revisar conexión/tabla).", "local");
+    }
+  } else {
+    showStatus("Guardada localmente. Configura SUPABASE_ANON_KEY para sincronizar.", "local");
+  }
+  loadHotelAverages();
+  showReportActions(entry);
+  resetFormForNextProfile();
+});
+
+// ==================== Generación de informe (PDF / Word) ====================
+let lastSavedEntry = null;
+
+const SECCION_NOMBRES = {
+  ejecucion: "1. Ejecución Operativa de la Implementación",
+  funcionalidad: "2. Funcionalidad del Sistema",
+  infraestructura: "3. Infraestructura y Equipamiento",
+  adopcion: "4. Adopción Operativa"
+};
+const SECCION_ORDEN = ["ejecucion","funcionalidad","infraestructura","adopcion"];
+
+function valorLabel(valor, esQ13, entry){
+  if (esQ13) return (entry.pct_adopcion ?? "—") + "%";
+  const map = { cumple:"Cumple", parcial:"Parcial", nocumple:"No cumple", na:"No aplica" };
+  return map[valor] || "Sin responder";
+}
+
+function showReportActions(entry){
+  lastSavedEntry = entry;
+  document.getElementById("report-actions").style.display = "block";
+  document.getElementById("report-actions-label").textContent =
+    `${entry.hotel} · ${entry.perfil_entrevistado} · ${entry.fecha}${entry.score_general !== null ? " · " + entry.score_general + "%" : ""}`;
+}
+
+function buildReportHTML(entry){
+  const HOTEL_NAME = HOTEL_NAMES[entry.hotel] || entry.hotel;
+  let sectionsHtml = "";
+  SECCION_ORDEN.forEach(sec => {
+    const items = entry.respuestas.filter(r => r.seccion === sec);
+    let rows = "";
+    items.forEach(r => {
+      const esQ13 = /^Q13\./.test(r.pregunta);
+      rows += `
+        <tr>
+          <td style="padding:8px;border:1px solid #D9D3CC;">${r.pregunta}</td>
+          <td style="padding:8px;border:1px solid #D9D3CC;text-align:center;white-space:nowrap;font-weight:bold;color:#1F3864;">${valorLabel(r.valor, esQ13, entry)}</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding:6px 8px;border:1px solid #D9D3CC;font-size:.85em;color:#6B7280;font-style:italic;">
+            Comentario/evidencia: ${r.comentario ? r.comentario.replace(/</g,"&lt;") : "—"}
+          </td>
+        </tr>`;
+    });
+    const score = entry["score_" + sec];
+    sectionsHtml += `
+      <h2 style="color:#1F3864;border-bottom:3px solid #B08D3E;padding-bottom:4px;font-size:1.05rem;margin-top:26px;">${SECCION_NOMBRES[sec]}</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:.92rem;margin-top:8px;">
+        ${rows}
+      </table>
+      <p style="text-align:right;font-weight:bold;color:#1F3864;margin:6px 0 0;">Puntaje de la sección: ${score !== null ? score + "%" : "—"}</p>`;
+  });
+
+  const b = badgeFor(entry.score_general);
+  const badgeColor = b.cls === "green" ? "#2E7D46" : b.cls === "yellow" ? "#B08D3E" : b.cls === "red" ? "#B3261E" : "#6B7280";
+
+  return `
+    <div style="background:#1F3864;color:#fff;padding:22px 24px;border-bottom:4px solid #B08D3E;font-family:Arial,sans-serif;">
+      <p style="margin:0 0 6px;font-size:.72rem;font-weight:bold;letter-spacing:.04em;color:#D4B876;text-transform:uppercase;">
+        Grupo Martinón · Dirección Corporativa de Implementación y Procesos
+      </p>
+      <h1 style="margin:0 0 6px;font-size:1.3rem;">Ficha de Validación de Campo — MaintainX</h1>
+      <p style="margin:0;font-size:.85rem;color:#D9E0EC;">${HOTEL_NAME} (${entry.hotel}) · ${entry.fecha} · Perfil: ${entry.perfil_entrevistado}</p>
+    </div>
+    <div style="font-family:Arial,sans-serif;padding:20px 4px;color:#2A2A2A;">
+      <table style="width:100%;border-collapse:collapse;font-size:.9rem;margin-bottom:10px;">
+        <tr><td style="background:#EDE9E6;font-weight:bold;padding:6px 8px;border:1px solid #D9D3CC;width:220px;">Hotel</td><td style="padding:6px 8px;border:1px solid #D9D3CC;">${HOTEL_NAME} (${entry.hotel})</td></tr>
+        <tr><td style="background:#EDE9E6;font-weight:bold;padding:6px 8px;border:1px solid #D9D3CC;">Fecha</td><td style="padding:6px 8px;border:1px solid #D9D3CC;">${entry.fecha}</td></tr>
+        <tr><td style="background:#EDE9E6;font-weight:bold;padding:6px 8px;border:1px solid #D9D3CC;">Evaluador</td><td style="padding:6px 8px;border:1px solid #D9D3CC;">${entry.evaluador || "—"}</td></tr>
+        <tr><td style="background:#EDE9E6;font-weight:bold;padding:6px 8px;border:1px solid #D9D3CC;">Responsable de mantenimiento</td><td style="padding:6px 8px;border:1px solid #D9D3CC;">${entry.responsable_propiedad || "—"}</td></tr>
+        <tr><td style="background:#EDE9E6;font-weight:bold;padding:6px 8px;border:1px solid #D9D3CC;">Perfil entrevistado</td><td style="padding:6px 8px;border:1px solid #D9D3CC;">${entry.perfil_entrevistado}</td></tr>
+      </table>
+
+      ${sectionsHtml}
+
+      <h2 style="color:#1F3864;border-bottom:3px solid #B08D3E;padding-bottom:4px;font-size:1.05rem;margin-top:26px;">Hallazgos generales y plan de acción</h2>
+      <p style="margin:10px 0 4px;"><b>Hallazgos:</b></p>
+      <p style="margin:0 0 12px;white-space:pre-wrap;">${(entry.hallazgos || "—").replace(/</g,"&lt;")}</p>
+      <p style="margin:10px 0 4px;"><b>Plan de acción propuesto:</b></p>
+      <p style="margin:0;white-space:pre-wrap;">${(entry.plan_accion || "—").replace(/</g,"&lt;")}</p>
+
+      <h2 style="color:#1F3864;border-bottom:3px solid #B08D3E;padding-bottom:4px;font-size:1.05rem;margin-top:26px;">Resumen de cumplimiento</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:.92rem;margin-top:8px;">
+        <tr><td style="background:#EDE9E6;font-weight:bold;padding:7px 8px;border:1px solid #D9D3CC;">1. Ejecución Operativa de la Implementación</td><td style="padding:7px 8px;border:1px solid #D9D3CC;text-align:center;">${entry.score_ejecucion ?? "—"}%</td></tr>
+        <tr><td style="background:#EDE9E6;font-weight:bold;padding:7px 8px;border:1px solid #D9D3CC;">2. Funcionalidad del Sistema</td><td style="padding:7px 8px;border:1px solid #D9D3CC;text-align:center;">${entry.score_funcionalidad ?? "—"}%</td></tr>
+        <tr><td style="background:#EDE9E6;font-weight:bold;padding:7px 8px;border:1px solid #D9D3CC;">3. Infraestructura y Equipamiento</td><td style="padding:7px 8px;border:1px solid #D9D3CC;text-align:center;">${entry.score_infraestructura ?? "—"}%</td></tr>
+        <tr><td style="background:#EDE9E6;font-weight:bold;padding:7px 8px;border:1px solid #D9D3CC;">4. Adopción Operativa</td><td style="padding:7px 8px;border:1px solid #D9D3CC;text-align:center;">${entry.score_adopcion ?? "—"}%</td></tr>
+        <tr><td style="background:#B08D3E;color:#fff;font-weight:bold;padding:9px 8px;border:1px solid #D9D3CC;">PROMEDIO GENERAL</td><td style="background:#B08D3E;color:#fff;font-weight:bold;padding:9px 8px;border:1px solid #D9D3CC;text-align:center;">${entry.score_general ?? "—"}%</td></tr>
+      </table>
+      <p style="margin-top:10px;"><span style="display:inline-block;padding:3px 12px;border-radius:10px;background:${badgeColor};color:#fff;font-size:.8rem;font-weight:bold;">${b.txt}</span></p>
+      <p style="font-size:.78rem;color:#6B7280;margin-top:14px;">Metodología: Cumple = 100% · Parcial = 50% · No cumple = 0% · No aplica se excluye del cálculo.</p>
+    </div>`;
+}
+
+function downloadPDF(entry){
+  const html = buildReportHTML(entry);
+  const w = window.open("", "_blank");
+  if (!w){ showStatus("El navegador bloqueó la ventana de impresión. Permite pop-ups para este sitio.", "err"); return; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+    <title>Informe MaintainX ${entry.hotel} ${entry.fecha}</title>
+    <style>@page{size:letter;margin:0.6in;} body{margin:0;}</style>
+    </head><body>${html}</body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 350);
+}
+
+function downloadWord(entry){
+  const html = buildReportHTML(entry);
+  const wrapper = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset="utf-8"><title>Informe MaintainX</title></head>
+    <body>${html}</body></html>`;
+  const blob = new Blob(["\ufeff", wrapper], { type: "application/msword" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Informe_MaintainX_${entry.hotel}_${entry.fecha}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById("btn-pdf").addEventListener("click", () => {
+  if (lastSavedEntry) downloadPDF(lastSavedEntry);
+});
+document.getElementById("btn-word").addEventListener("click", () => {
+  if (lastSavedEntry) downloadWord(lastSavedEntry);
+});
+
+function resetFormForNextProfile(){
+  // Mantiene Hotel y Fecha (mismo sitio, mismo día); limpia todo lo demás
+  // para que la siguiente persona entrevistada empiece en blanco.
+  document.getElementById("evaluador").value = "";
+  document.getElementById("responsable_prop").value = "";
+  document.getElementById("perfil_entrevistado").value = "";
+  document.getElementById("perfil_otro").value = "";
+  document.getElementById("perfil_otro_wrap").style.display = "none";
+  document.getElementById("hallazgos").value = "";
+  document.getElementById("plan_accion").value = "";
+  document.querySelectorAll(".opt.sel").forEach(o => o.classList.remove("sel"));
+  document.querySelectorAll(".item textarea.comentario").forEach(t => t.value = "");
+  const slider = document.querySelector(".pct-slider");
+  slider.value = 50;
+  slider.parentElement.querySelector(".pct-val").textContent = "50%";
+  recalcScores();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+renderEntries();
+recalcScores();
+loadHotelAverages();
+</script>
+
+</body>
+</html>
