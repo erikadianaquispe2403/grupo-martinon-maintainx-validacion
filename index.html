@@ -159,12 +159,45 @@
     align-items:center;
     gap:8px;
   }
-  .pct-field input[type=range]{flex:1;}
-  .pct-field .pct-val{
-    min-width:44px;
+  .pct-field input[type=number]{
+    width:90px;
+    padding:9px 10px;
+    border:1px solid var(--border);
+    border-radius:3px;
+    font-family:inherit;
+    font-size:1rem;
     font-weight:700;
     color:var(--navy);
-    text-align:right;
+  }
+  .pct-field .pct-suffix{
+    font-weight:700;
+    color:var(--navy);
+  }
+  .track-hidden{display:none !important;}
+  .entry-actions{display:flex;gap:6px;margin-top:6px;}
+  .entry-actions button{
+    font-size:.72rem;
+    padding:4px 10px;
+    border-radius:3px;
+    border:1px solid var(--border);
+    background:var(--white);
+    color:var(--navy);
+    cursor:pointer;
+  }
+  .entry-actions button.danger{color:var(--red);border-color:var(--red);}
+  .hist-row{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    font-size:.85rem;
+  }
+  .hist-row .hist-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
   }
   .summary{
     background:var(--navy);
@@ -309,11 +342,15 @@
         </div>
         <div>
           <label class="field-label">Evaluador</label>
-          <input type="text" id="evaluador" placeholder="Nombre">
+          <input type="text" id="evaluador" placeholder="Nombre" value="Erika Quispe">
         </div>
         <div>
           <label class="field-label">Responsable de mantenimiento (propiedad)</label>
           <input type="text" id="responsable_prop" placeholder="Nombre">
+        </div>
+        <div>
+          <label class="field-label">Nombre del entrevistado</label>
+          <input type="text" id="nombre_entrevistado" placeholder="Nombre y apellido">
         </div>
         <div>
           <label class="field-label">Perfil entrevistado</label>
@@ -333,12 +370,12 @@
           <input type="text" id="perfil_otro" placeholder="Describe el perfil">
         </div>
       </div>
-      <p style="font-size:.78rem;color:var(--grey);margin:10px 0 0;">Se recomienda llenar una ficha por cada perfil entrevistado en el hotel, para tener una visión completa.</p>
+      <p id="track-indicator" style="font-size:.78rem;color:var(--grey);margin:10px 0 0;">Se recomienda llenar una ficha por cada entrevistado en el hotel, para tener una visión completa. Según el perfil que elijas, la ficha te mostrará las preguntas técnicas completas (Mantenimiento) o un set más corto para clientes internos.</p>
     </div>
   </div>
 
   <!-- 1. Ejecución Operativa de la Implementación -->
-  <div class="card" data-section="ejecucion">
+  <div class="card" data-section="ejecucion" data-track="mtto">
     <div class="card-head"><h2>1. Ejecución Operativa de la Implementación</h2><div class="score" data-score-for="ejecucion">—</div></div>
     <div class="card-body">
 
@@ -382,7 +419,7 @@
   </div>
 
   <!-- 2. Funcionalidad del Sistema -->
-  <div class="card" data-section="funcionalidad">
+  <div class="card" data-section="funcionalidad" data-track="mtto">
     <div class="card-head"><h2>2. Funcionalidad del Sistema</h2><div class="score" data-score-for="funcionalidad">—</div></div>
     <div class="card-body">
 
@@ -432,7 +469,7 @@
   </div>
 
   <!-- 3. Infraestructura y Equipamiento -->
-  <div class="card" data-section="infraestructura">
+  <div class="card" data-section="infraestructura" data-track="mtto">
     <div class="card-head"><h2>3. Infraestructura y Equipamiento</h2><div class="score" data-score-for="infraestructura">—</div></div>
     <div class="card-body">
 
@@ -458,15 +495,14 @@
   </div>
 
   <!-- 4. Adopción Operativa -->
-  <div class="card" data-section="adopcion">
+  <div class="card" data-section="adopcion" data-track="mtto">
     <div class="card-head"><h2>4. Adopción Operativa</h2><div class="score" data-score-for="adopcion">—</div></div>
     <div class="card-body">
 
       <div class="item" data-item>
         <p class="q">Q17. Estimado de qué % de las fallas reportadas en la propiedad entra realmente por MaintainX (vs. WhatsApp / llamada / papel).</p>
         <div class="pct-field">
-          <input type="range" min="0" max="100" value="50" class="pct-slider">
-          <span class="pct-val">50%</span>
+          <input type="number" min="0" max="100" placeholder="Ej. 70" class="pct-input"><span class="pct-suffix">%</span>
         </div>
         <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
       </div>
@@ -504,6 +540,96 @@
     </div>
   </div>
 
+  <!-- ================= PISTA: CLIENTE INTERNO (no mantenimiento) ================= -->
+
+  <!-- 1. Ejecución Operativa (cliente interno) -->
+  <div class="card" data-section="ejecucion" data-track="cliente">
+    <div class="card-head"><h2>1. Ejecución Operativa de la Implementación</h2><div class="score" data-score-for="ejecucion">—</div></div>
+    <div class="card-body">
+
+      <div class="item" data-item>
+        <p class="q">CI1. Recibiste capacitación (formal o informal) de cómo reportar una falla en MaintainX.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">CI2. Conoces el procedimiento de cómo reportar una falla (a quién avisar, qué canal usar según tu área y horario).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">CI3. Sabes desde cuándo tu área empezó a usar MaintainX (fecha de arranque conocida).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. Funcionalidad del Sistema (cliente interno) -->
+  <div class="card" data-section="funcionalidad" data-track="cliente">
+    <div class="card-head"><h2>2. Funcionalidad del Sistema</h2><div class="score" data-score-for="funcionalidad">—</div></div>
+    <div class="card-body">
+
+      <div class="item" data-item>
+        <p class="q">CI4. Cuando reportas una falla, tienes forma de confirmar que quedó registrada correctamente (no se pierde en el aire).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">CI5. Has notado si el sistema reconoce cuando reportas la misma falla varias veces (repetitivos), o siempre parece "nueva".</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3. Infraestructura y Equipamiento (cliente interno) -->
+  <div class="card" data-section="infraestructura" data-track="cliente">
+    <div class="card-head"><h2>3. Infraestructura y Equipamiento</h2><div class="score" data-score-for="infraestructura">—</div></div>
+    <div class="card-body">
+
+      <div class="item" data-item>
+        <p class="q">CI6. Tienes forma de reportar una falla sin depender de pedir prestado un dispositivo a otro compañero.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 4. Adopción Operativa (cliente interno) -->
+  <div class="card" data-section="adopcion" data-track="cliente">
+    <div class="card-head"><h2>4. Adopción Operativa</h2><div class="score" data-score-for="adopcion">—</div></div>
+    <div class="card-body">
+
+      <div class="item" data-item>
+        <p class="q">CI7. Estimado de qué % de las fallas de tu área realmente reportas por MaintainX (vs. WhatsApp / llamada / papel).</p>
+        <div class="pct-field">
+          <input type="number" min="0" max="100" placeholder="Ej. 70" class="pct-input"><span class="pct-suffix">%</span>
+        </div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">CI8. Sientes que las fallas que reportas se resuelven de verdad, o notas que se repiten con el tiempo.</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+      <div class="item" data-item>
+        <p class="q">CI9. Recibes retroalimentación de cuándo se resolvió el reporte que hiciste (cierre comunicado, no solo silencio).</p>
+        <div class="options"></div>
+        <textarea class="comentario" placeholder="Comentario / evidencia"></textarea>
+      </div>
+
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-head"><h2>Hallazgos generales y plan de acción</h2></div>
     <div class="card-body">
@@ -527,6 +653,9 @@
   </div>
 
   <button class="primary" id="btn-guardar">Guardar ficha</button>
+  <div id="cancel-edit-wrap" style="display:none;">
+    <button class="secondary" id="btn-cancel-edit" style="margin-top:8px;">Cancelar edición</button>
+  </div>
   <div class="status-msg" id="status-msg"></div>
 
   <div class="card" id="report-actions" style="display:none;margin-top:14px;">
@@ -545,6 +674,34 @@
       <span id="hotel-avg-source"></span>
     </p>
     <div id="hotel-avg-container"></div>
+  </div>
+
+  <div class="entries-list">
+    <h3>Consultar histórico</h3>
+    <p style="font-size:.78rem;color:var(--grey);margin-top:-6px;margin-bottom:12px;">Busca fichas guardadas por cualquier evaluador, en cualquier dispositivo, filtrando por hotel y rango de fechas (consulta directo a Supabase).</p>
+    <div class="meta-grid" style="margin-bottom:10px;">
+      <div>
+        <label class="field-label">Hotel</label>
+        <select id="hist-hotel">
+          <option value="">Todos</option>
+          <option value="BREPC">BREPC — Breathless Punta Cana</option>
+          <option value="DROPC">DROPC — Dreams Onyx Punta Cana</option>
+          <option value="DRFPC">DRFPC — Dreams Flora Punta Cana</option>
+          <option value="DRRPC">DRRPC — Dreams Royal Beach Punta Cana</option>
+          <option value="SERPC">SERPC — Secrets Royal Beach Punta Cana</option>
+        </select>
+      </div>
+      <div>
+        <label class="field-label">Desde</label>
+        <input type="date" id="hist-desde">
+      </div>
+      <div>
+        <label class="field-label">Hasta</label>
+        <input type="date" id="hist-hasta">
+      </div>
+    </div>
+    <button class="secondary" id="btn-hist-buscar" style="margin-top:0;">🔎 Buscar</button>
+    <div id="hist-results" style="margin-top:12px;"></div>
   </div>
 
   <div class="entries-list">
@@ -569,6 +726,14 @@
 // Usar el mismo proyecto que las demás apps de campo (wwnuiriqjbiaggmdrlrk).
 // Crear antes la tabla `maintainx_validation_entries` (ver esquema sugerido
 // al final de este bloque de comentarios).
+//
+// IMPORTANTE — columnas nuevas y políticas RLS que faltan agregar:
+//   alter table maintainx_validation_entries add column nombre_entrevistado text;
+//   alter table maintainx_validation_entries add column track text;
+//   create policy "update_anon" on maintainx_validation_entries for update to anon using (true) with check (true);
+//   create policy "delete_anon" on maintainx_validation_entries for delete to anon using (true);
+// Sin las políticas de update/delete, los botones de Editar/Eliminar
+// fallarán aunque insert/select ya estén funcionando.
 // =========================================================================
 const SUPABASE_URL = "https://wwnuiriqjbiaggmdrlrk.supabase.co"; // confirmar
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3bnVpcmlxamJpYWdnbWRybHJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5OTY5NTgsImV4cCI6MjEwMjU3Mjk1OH0.rNehaDSqpjnb5XvJ-KXfnVU6bGJQzYDKnX54w6ISrh0";
@@ -589,6 +754,8 @@ try {
    evaluador     text
    responsable_propiedad text
    perfil_entrevistado text
+   nombre_entrevistado text
+   track         text    -- 'mtto' o 'cliente'
    respuestas    jsonb   -- array de {seccion, pregunta, valor, comentario}
    pct_adopcion  int
    hallazgos     text
@@ -607,7 +774,7 @@ const OPTIONS = [
   {key:"na", label:"No aplica", val:null},
 ];
 
-// Build option buttons for every item that has an .options div (skip the % slider item)
+// Build option buttons for every item that has an .options div (skip the % input item)
 document.querySelectorAll(".item .options").forEach(optDiv => {
   OPTIONS.forEach(o => {
     const btn = document.createElement("div");
@@ -623,19 +790,34 @@ document.querySelectorAll(".item .options").forEach(optDiv => {
   });
 });
 
-// % slider live label
-document.querySelectorAll(".pct-slider").forEach(sl => {
-  const label = sl.parentElement.querySelector(".pct-val");
-  sl.addEventListener("input", () => { label.textContent = sl.value + "%"; });
+document.querySelectorAll(".pct-input").forEach(inp => {
+  inp.addEventListener("input", recalcScores);
 });
 
 document.getElementById("fecha").valueAsDate = new Date();
+
+const MTTO_PROFILES = ["Jefe/Gerente de Mantenimiento", "Técnico de Mantenimiento"];
+let currentTrack = "mtto";
+
+function setTrack(track){
+  currentTrack = track;
+  document.querySelectorAll('.card[data-track]').forEach(card => {
+    card.classList.toggle('track-hidden', card.dataset.track !== track);
+  });
+  const indicator = document.getElementById("track-indicator");
+  indicator.textContent = track === "mtto"
+    ? "Perfil de Mantenimiento: mostrando las 22 preguntas técnicas completas."
+    : "Perfil de cliente interno: mostrando el set corto orientado a la experiencia de reportar fallas.";
+  recalcScores();
+}
 
 const perfilSelect = document.getElementById("perfil_entrevistado");
 const perfilOtroWrap = document.getElementById("perfil_otro_wrap");
 perfilSelect.addEventListener("change", () => {
   perfilOtroWrap.style.display = perfilSelect.value === "Otros" ? "block" : "none";
   if (perfilSelect.value !== "Otros") document.getElementById("perfil_otro").value = "";
+  const track = MTTO_PROFILES.includes(perfilSelect.value) ? "mtto" : "cliente";
+  setTrack(track);
 });
 
 function sectionScore(sectionEl){
@@ -643,6 +825,14 @@ function sectionScore(sectionEl){
   let sum = 0, count = 0;
   items.forEach(it => {
     const sel = it.querySelector(".opt.sel");
+    const pctInput = it.querySelector(".pct-input");
+    if (pctInput){
+      if (pctInput.value !== ""){
+        sum += Math.max(0, Math.min(100, parseFloat(pctInput.value)));
+        count++;
+      }
+      return;
+    }
     if (sel && sel.dataset.val !== "na") {
       sum += parseFloat(sel.dataset.val);
       count++;
@@ -663,10 +853,15 @@ function recalcScores(){
   const sections = ["ejecucion","funcionalidad","infraestructura","adopcion"];
   const scores = {};
   sections.forEach(s => {
-    const el = document.querySelector(`.card[data-section="${s}"]`);
-    const sc = sectionScore(el);
+    const el = document.querySelector(`.card[data-section="${s}"][data-track="${currentTrack}"]`);
+    const sc = el ? sectionScore(el) : null;
     scores[s] = sc;
-    document.querySelector(`[data-score-for="${s}"]`).textContent = sc === null ? "—" : sc + "%";
+    document.querySelectorAll(`[data-score-for="${s}"]`).forEach(badgeEl => {
+      const owningCard = badgeEl.closest('.card');
+      if (!owningCard || owningCard.dataset.track === currentTrack){
+        badgeEl.textContent = sc === null ? "—" : sc + "%";
+      }
+    });
     document.getElementById("sum-" + s).textContent = sc === null ? "—" : sc + "%";
   });
   const valid = sections.map(s => scores[s]).filter(v => v !== null);
@@ -681,15 +876,16 @@ function recalcScores(){
 
 function collectRespuestas(){
   const respuestas = [];
-  document.querySelectorAll(".card[data-section]").forEach(card => {
+  document.querySelectorAll(`.card[data-section][data-track="${currentTrack}"]`).forEach(card => {
     const seccion = card.dataset.section;
     card.querySelectorAll(".item[data-item]").forEach(it => {
       const q = it.querySelector(".q").textContent;
       const sel = it.querySelector(".opt.sel");
+      const pctInput = it.querySelector(".pct-input");
       const comentario = it.querySelector(".comentario").value;
       respuestas.push({
         seccion, pregunta: q,
-        valor: sel ? sel.classList[1] : null,
+        valor: pctInput ? (pctInput.value !== "" ? pctInput.value + "%" : null) : (sel ? sel.classList[1] : null),
         comentario
       });
     });
@@ -725,10 +921,30 @@ function renderEntries(){
   entries.slice().reverse().forEach(e => {
     const row = document.createElement("div");
     row.className = "entry-row";
+    row.style.flexDirection = "column";
+    row.style.alignItems = "stretch";
     const syncBadge = e.synced === false
       ? '<span style="display:block;font-size:.68rem;color:var(--red);font-weight:700;margin-top:2px;">⚠ no sincronizada</span>'
       : '';
-    row.innerHTML = `<span>${e.hotel} · ${e.perfil_entrevistado || 's/perfil'} · ${e.fecha}${syncBadge}</span><span class="pill">${e.score_general !== null ? e.score_general + '%' : 's/d'}</span>`;
+    const top = document.createElement("div");
+    top.style.display = "flex";
+    top.style.justifyContent = "space-between";
+    top.innerHTML = `<span>${e.hotel} · ${e.perfil_entrevistado || 's/perfil'} · ${e.fecha}${syncBadge}</span><span class="pill">${e.score_general !== null ? e.score_general + '%' : 's/d'}</span>`;
+    row.appendChild(top);
+
+    const actions = document.createElement("div");
+    actions.className = "entry-actions";
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏️ Editar";
+    editBtn.addEventListener("click", () => loadEntryIntoForm(e));
+    actions.appendChild(editBtn);
+    const delBtn = document.createElement("button");
+    delBtn.className = "danger";
+    delBtn.textContent = "🗑️ Eliminar";
+    delBtn.addEventListener("click", () => deleteEntry(e, { fromLocal: true }));
+    actions.appendChild(delBtn);
+    row.appendChild(actions);
+
     container.appendChild(row);
   });
 }
@@ -788,6 +1004,8 @@ async function loadHotelAverages(){
   renderHotelAverages(local, "local");
 }
 
+let editingId = null; // { local_id, supabase_id }
+
 document.getElementById("btn-guardar").addEventListener("click", async () => {
   const hotel = document.getElementById("hotel").value;
   const fecha = document.getElementById("fecha").value;
@@ -816,9 +1034,14 @@ document.getElementById("btn-guardar").addEventListener("click", async () => {
     fecha,
     evaluador: document.getElementById("evaluador").value,
     responsable_propiedad: document.getElementById("responsable_prop").value,
+    nombre_entrevistado: document.getElementById("nombre_entrevistado").value,
     perfil_entrevistado,
+    track: currentTrack,
     respuestas: collectRespuestas(),
-    pct_adopcion: parseInt(document.querySelector(".pct-slider").value, 10),
+    pct_adopcion: (() => {
+      const inp = document.querySelector(`.card[data-track="${currentTrack}"] .pct-input`);
+      return inp && inp.value !== "" ? parseInt(inp.value, 10) : null;
+    })(),
     hallazgos: document.getElementById("hallazgos").value,
     plan_accion: document.getElementById("plan_accion").value,
     score_ejecucion: scores.ejecucion,
@@ -829,7 +1052,40 @@ document.getElementById("btn-guardar").addEventListener("click", async () => {
     created_at: new Date().toISOString()
   };
 
-  // Guardar siempre localmente primero (resiliencia offline), con metadata de sincronización
+  // ---- Modo edición: actualizar ficha existente en vez de crear una nueva ----
+  if (editingId){
+    if (!supabaseClient || !editingId.supabase_id){
+      showStatus("No se puede actualizar: esta ficha no está sincronizada con Supabase todavía.", "err");
+      return;
+    }
+    try {
+      const { error } = await supabaseClient.from(SUPABASE_TABLE).update(entry).eq("id", editingId.supabase_id);
+      if (error) throw error;
+      if (editingId.local_id){
+        const local = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
+        const idx = local.findIndex(e => e._local_id === editingId.local_id);
+        if (idx !== -1){
+          local[idx] = { ...entry, _local_id: editingId.local_id, synced: true, supabase_id: editingId.supabase_id };
+          localStorage.setItem("maintainx_entries", JSON.stringify(local));
+        }
+      }
+      showStatus("Ficha actualizada correctamente.", "ok");
+    } catch (err){
+      console.error(err);
+      showStatus("No se pudo actualizar en Supabase. Revisa tu conexión.", "err");
+      return;
+    }
+    editingId = null;
+    document.getElementById("btn-guardar").textContent = "Guardar ficha";
+    document.getElementById("cancel-edit-wrap").style.display = "none";
+    renderEntries();
+    loadHotelAverages();
+    showReportActions(entry);
+    resetFormForNextProfile();
+    return;
+  }
+
+  // ---- Modo normal: nueva ficha ----
   const localId = "loc_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
   const local = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
   local.push({ ...entry, _local_id: localId, synced: false });
@@ -838,9 +1094,10 @@ document.getElementById("btn-guardar").addEventListener("click", async () => {
 
   if (supabaseClient){
     try {
-      const { error } = await supabaseClient.from(SUPABASE_TABLE).insert([entry]);
+      const { data, error } = await supabaseClient.from(SUPABASE_TABLE).insert([entry]).select();
       if (error) throw error;
-      markLocalSynced(localId);
+      const newId = data && data[0] && data[0].id;
+      markLocalSynced(localId, newId);
       showStatus("Ficha guardada y sincronizada con Supabase.", "ok");
     } catch (err){
       console.error(err);
@@ -855,11 +1112,12 @@ document.getElementById("btn-guardar").addEventListener("click", async () => {
   resetFormForNextProfile();
 });
 
-function markLocalSynced(localId){
+function markLocalSynced(localId, supabaseId){
   const local = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
   const idx = local.findIndex(e => e._local_id === localId);
   if (idx !== -1){
     local[idx].synced = true;
+    if (supabaseId) local[idx].supabase_id = supabaseId;
     localStorage.setItem("maintainx_entries", JSON.stringify(local));
   }
 }
@@ -880,7 +1138,7 @@ async function retrySync(){
   btn.textContent = "Sincronizando…";
   let okCount = 0, failCount = 0;
   for (const rec of pending){
-    const { _local_id, synced, ...payload } = rec;
+    const { _local_id, synced, supabase_id, ...payload } = rec;
     // Fichas guardadas antes de este cambio no tienen _local_id: se les asigna uno para poder marcarlas.
     const idToUse = _local_id || ("legacy_" + payload.hotel + "_" + payload.fecha + "_" + payload.perfil_entrevistado);
     if (!_local_id){
@@ -889,9 +1147,10 @@ async function retrySync(){
       if (idx !== -1){ all[idx]._local_id = idToUse; localStorage.setItem("maintainx_entries", JSON.stringify(all)); }
     }
     try {
-      const { error } = await supabaseClient.from(SUPABASE_TABLE).insert([payload]);
+      const { data, error } = await supabaseClient.from(SUPABASE_TABLE).insert([payload]).select();
       if (error) throw error;
-      markLocalSynced(idToUse);
+      const newId = data && data[0] && data[0].id;
+      markLocalSynced(idToUse, newId);
       okCount++;
     } catch (err){
       console.error("Fallo reintentando", idToUse, err);
@@ -911,6 +1170,156 @@ async function retrySync(){
 
 document.getElementById("btn-retry-sync").addEventListener("click", retrySync);
 
+// ==================== Editar / Eliminar ====================
+
+function loadEntryIntoForm(entry){
+  document.getElementById("hotel").value = entry.hotel || "";
+  document.getElementById("fecha").value = entry.fecha || "";
+  document.getElementById("evaluador").value = entry.evaluador || "Erika Quispe";
+  document.getElementById("responsable_prop").value = entry.responsable_propiedad || "";
+  document.getElementById("nombre_entrevistado").value = entry.nombre_entrevistado || "";
+
+  const perfilSelect = document.getElementById("perfil_entrevistado");
+  const knownProfiles = Array.from(perfilSelect.options).map(o => o.value).filter(v => v && v !== "Otros");
+  if (knownProfiles.includes(entry.perfil_entrevistado)){
+    perfilSelect.value = entry.perfil_entrevistado;
+    document.getElementById("perfil_otro_wrap").style.display = "none";
+  } else {
+    perfilSelect.value = "Otros";
+    document.getElementById("perfil_otro_wrap").style.display = "block";
+    document.getElementById("perfil_otro").value = entry.perfil_entrevistado || "";
+  }
+  const track = entry.track || (MTTO_PROFILES.includes(entry.perfil_entrevistado) ? "mtto" : "cliente");
+  setTrack(track);
+
+  // Limpiar respuestas de ambas pistas antes de precargar
+  document.querySelectorAll(".opt.sel").forEach(o => o.classList.remove("sel"));
+  document.querySelectorAll(".item textarea.comentario").forEach(t => t.value = "");
+  document.querySelectorAll(".pct-input").forEach(inp => inp.value = "");
+
+  const activeCards = document.querySelectorAll(`.card[data-section][data-track="${track}"]`);
+  (entry.respuestas || []).forEach(r => {
+    activeCards.forEach(card => {
+      card.querySelectorAll(".item[data-item]").forEach(it => {
+        const qText = it.querySelector(".q").textContent;
+        if (qText !== r.pregunta) return;
+        const pctInput = it.querySelector(".pct-input");
+        if (pctInput){
+          if (r.valor && String(r.valor).endsWith("%")) pctInput.value = String(r.valor).replace("%","");
+        } else if (r.valor){
+          const opt = it.querySelector(`.opt.${r.valor}`);
+          if (opt) opt.classList.add("sel");
+        }
+        if (r.comentario) it.querySelector(".comentario").value = r.comentario;
+      });
+    });
+  });
+
+  document.getElementById("hallazgos").value = entry.hallazgos || "";
+  document.getElementById("plan_accion").value = entry.plan_accion || "";
+
+  editingId = { local_id: entry._local_id || null, supabase_id: entry.supabase_id || entry.id || null };
+  document.getElementById("btn-guardar").textContent = "Actualizar ficha";
+  document.getElementById("cancel-edit-wrap").style.display = "block";
+  recalcScores();
+  window.scrollTo({top:0, behavior:"smooth"});
+  showStatus("Editando ficha existente. Los cambios se guardarán sobre la misma ficha al presionar \"Actualizar ficha\".", "local");
+}
+
+document.getElementById("btn-cancel-edit").addEventListener("click", () => {
+  editingId = null;
+  document.getElementById("btn-guardar").textContent = "Guardar ficha";
+  document.getElementById("cancel-edit-wrap").style.display = "none";
+  resetFormForNextProfile();
+});
+
+async function deleteEntry(entry, opts){
+  opts = opts || {};
+  const label = `${entry.hotel} · ${entry.perfil_entrevistado || ''} · ${entry.fecha}`;
+  if (!confirm(`¿Eliminar esta ficha? ${label}\n\nEsta acción no se puede deshacer.`)) return;
+
+  const supabaseId = entry.supabase_id || entry.id || null;
+  if (supabaseId && supabaseClient){
+    try {
+      const { error } = await supabaseClient.from(SUPABASE_TABLE).delete().eq("id", supabaseId);
+      if (error) throw error;
+    } catch (err){
+      console.error(err);
+      showStatus("No se pudo eliminar de Supabase. Revisa tu conexión e inténtalo de nuevo.", "err");
+      return;
+    }
+  }
+
+  if (opts.fromLocal || entry._local_id){
+    const local = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
+    const filtered = local.filter(e => e._local_id !== entry._local_id);
+    localStorage.setItem("maintainx_entries", JSON.stringify(filtered));
+  }
+
+  showStatus("Ficha eliminada.", "ok");
+  renderEntries();
+  loadHotelAverages();
+  if (opts.onDeleted) opts.onDeleted();
+}
+
+// ==================== Consultar histórico ====================
+
+function renderHistResults(rows){
+  const container = document.getElementById("hist-results");
+  container.innerHTML = "";
+  if (!rows.length){
+    container.innerHTML = '<p style="font-size:.85rem;color:var(--grey);">No se encontraron fichas con esos filtros.</p>';
+    return;
+  }
+  rows.forEach(entry => {
+    const row = document.createElement("div");
+    row.className = "hist-row";
+    row.innerHTML = `
+      <div class="hist-top">
+        <span><b>${entry.hotel}</b> · ${entry.perfil_entrevistado || 's/perfil'}${entry.nombre_entrevistado ? " (" + entry.nombre_entrevistado + ")" : ""} · ${entry.fecha}</span>
+        <span class="pill">${entry.score_general !== null && entry.score_general !== undefined ? entry.score_general + '%' : 's/d'}</span>
+      </div>
+      <div class="entry-actions" style="margin-top:8px;">
+        <button class="btn-hist-pdf">📄 PDF</button>
+        <button class="btn-hist-word">📝 Word</button>
+        <button class="btn-hist-edit">✏️ Editar</button>
+        <button class="btn-hist-del danger">🗑️ Eliminar</button>
+      </div>`;
+    row.querySelector(".btn-hist-pdf").addEventListener("click", () => downloadPDF(entry));
+    row.querySelector(".btn-hist-word").addEventListener("click", () => downloadWord(entry));
+    row.querySelector(".btn-hist-edit").addEventListener("click", () => loadEntryIntoForm(entry));
+    row.querySelector(".btn-hist-del").addEventListener("click", () => deleteEntry(entry, { onDeleted: () => row.remove() }));
+    container.appendChild(row);
+  });
+}
+
+document.getElementById("btn-hist-buscar").addEventListener("click", async () => {
+  if (!supabaseClient){
+    document.getElementById("hist-results").innerHTML = '<p style="font-size:.85rem;color:var(--red);">No se puede consultar el histórico: falta configurar SUPABASE_ANON_KEY.</p>';
+    return;
+  }
+  const hotel = document.getElementById("hist-hotel").value;
+  const desde = document.getElementById("hist-desde").value;
+  const hasta = document.getElementById("hist-hasta").value;
+  const btn = document.getElementById("btn-hist-buscar");
+  btn.disabled = true;
+  btn.textContent = "Buscando…";
+  try {
+    let query = supabaseClient.from(SUPABASE_TABLE).select("*").order("fecha", { ascending: false });
+    if (hotel) query = query.eq("hotel", hotel);
+    if (desde) query = query.gte("fecha", desde);
+    if (hasta) query = query.lte("fecha", hasta);
+    const { data, error } = await query;
+    if (error) throw error;
+    renderHistResults(data || []);
+  } catch (err){
+    console.error(err);
+    document.getElementById("hist-results").innerHTML = '<p style="font-size:.85rem;color:var(--red);">Error consultando Supabase. Revisa tu conexión.</p>';
+  }
+  btn.disabled = false;
+  btn.textContent = "🔎 Buscar";
+});
+
 // ==================== Generación de informe (PDF / Word) ====================
 let lastSavedEntry = null;
 
@@ -922,8 +1331,8 @@ const SECCION_NOMBRES = {
 };
 const SECCION_ORDEN = ["ejecucion","funcionalidad","infraestructura","adopcion"];
 
-function valorLabel(valor, esQ13, entry){
-  if (esQ13) return (entry.pct_adopcion ?? "—") + "%";
+function valorLabel(valor){
+  if (valor && String(valor).endsWith("%")) return valor;
   const map = { cumple:"Cumple", parcial:"Parcial", nocumple:"No cumple", na:"No aplica" };
   return map[valor] || "Sin responder";
 }
@@ -942,11 +1351,10 @@ function buildReportHTML(entry){
     const items = entry.respuestas.filter(r => r.seccion === sec);
     let rows = "";
     items.forEach(r => {
-      const esQ17 = /^Q17\./.test(r.pregunta);
       rows += `
         <tr>
           <td style="padding:8px;border:1px solid #D9D3CC;">${r.pregunta}</td>
-          <td style="padding:8px;border:1px solid #D9D3CC;text-align:center;white-space:nowrap;font-weight:bold;color:#1F3864;">${valorLabel(r.valor, esQ17, entry)}</td>
+          <td style="padding:8px;border:1px solid #D9D3CC;text-align:center;white-space:nowrap;font-weight:bold;color:#1F3864;">${valorLabel(r.valor)}</td>
         </tr>
         <tr>
           <td colspan="2" style="padding:6px 8px;border:1px solid #D9D3CC;font-size:.85em;color:#6B7280;font-style:italic;">
@@ -980,6 +1388,7 @@ function buildReportHTML(entry){
         <tr><td style="background:#EDE9E6;font-weight:bold;padding:6px 8px;border:1px solid #D9D3CC;">Fecha</td><td style="padding:6px 8px;border:1px solid #D9D3CC;">${entry.fecha}</td></tr>
         <tr><td style="background:#EDE9E6;font-weight:bold;padding:6px 8px;border:1px solid #D9D3CC;">Evaluador</td><td style="padding:6px 8px;border:1px solid #D9D3CC;">${entry.evaluador || "—"}</td></tr>
         <tr><td style="background:#EDE9E6;font-weight:bold;padding:6px 8px;border:1px solid #D9D3CC;">Responsable de mantenimiento</td><td style="padding:6px 8px;border:1px solid #D9D3CC;">${entry.responsable_propiedad || "—"}</td></tr>
+        <tr><td style="background:#EDE9E6;font-weight:bold;padding:6px 8px;border:1px solid #D9D3CC;">Nombre del entrevistado</td><td style="padding:6px 8px;border:1px solid #D9D3CC;">${entry.nombre_entrevistado || "—"}</td></tr>
         <tr><td style="background:#EDE9E6;font-weight:bold;padding:6px 8px;border:1px solid #D9D3CC;">Perfil entrevistado</td><td style="padding:6px 8px;border:1px solid #D9D3CC;">${entry.perfil_entrevistado}</td></tr>
       </table>
 
@@ -1041,10 +1450,11 @@ document.getElementById("btn-word").addEventListener("click", () => {
 });
 
 function resetFormForNextProfile(){
-  // Mantiene Hotel y Fecha (mismo sitio, mismo día); limpia todo lo demás
+  // Mantiene Hotel, Fecha y Evaluador (mismo sitio, misma visita); limpia todo lo demás
   // para que la siguiente persona entrevistada empiece en blanco.
-  document.getElementById("evaluador").value = "";
+  document.getElementById("evaluador").value = "Erika Quispe";
   document.getElementById("responsable_prop").value = "";
+  document.getElementById("nombre_entrevistado").value = "";
   document.getElementById("perfil_entrevistado").value = "";
   document.getElementById("perfil_otro").value = "";
   document.getElementById("perfil_otro_wrap").style.display = "none";
@@ -1052,17 +1462,16 @@ function resetFormForNextProfile(){
   document.getElementById("plan_accion").value = "";
   document.querySelectorAll(".opt.sel").forEach(o => o.classList.remove("sel"));
   document.querySelectorAll(".item textarea.comentario").forEach(t => t.value = "");
-  const slider = document.querySelector(".pct-slider");
-  slider.value = 50;
-  slider.parentElement.querySelector(".pct-val").textContent = "50%";
-  recalcScores();
+  document.querySelectorAll(".pct-input").forEach(inp => inp.value = "");
+  setTrack("mtto");
   window.scrollTo({top:0, behavior:"smooth"});
 }
 
+setTrack("mtto");
 renderEntries();
-recalcScores();
 loadHotelAverages();
 </script>
+
 
 </body>
 </html>
