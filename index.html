@@ -549,6 +549,10 @@
 
   <div class="entries-list">
     <h3>Fichas guardadas en este dispositivo</h3>
+    <div id="retry-sync-wrap" style="display:none;background:#FDF3E0;border:1px solid var(--gold);border-radius:4px;padding:10px 12px;margin-bottom:12px;">
+      <p id="retry-sync-count" style="font-size:.82rem;color:#6B5320;margin:0 0 8px;"></p>
+      <button class="secondary" id="btn-retry-sync" style="margin-top:0;width:100%;">🔄 Reintentar sincronización</button>
+    </div>
     <div id="entries-container"></div>
   </div>
 
@@ -703,6 +707,17 @@ function renderEntries(){
   const container = document.getElementById("entries-container");
   const entries = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
   container.innerHTML = "";
+
+  const pendingCount = entries.filter(e => !e.synced).length;
+  const retryWrap = document.getElementById("retry-sync-wrap");
+  const retryCount = document.getElementById("retry-sync-count");
+  if (pendingCount > 0){
+    retryWrap.style.display = "block";
+    retryCount.textContent = `${pendingCount} ficha(s) sin sincronizar en este dispositivo.`;
+  } else {
+    retryWrap.style.display = "none";
+  }
+
   if (!entries.length){
     container.innerHTML = '<p style="font-size:.85rem;color:var(--grey);">Aún no hay fichas guardadas.</p>';
     return;
@@ -710,7 +725,10 @@ function renderEntries(){
   entries.slice().reverse().forEach(e => {
     const row = document.createElement("div");
     row.className = "entry-row";
-    row.innerHTML = `<span>${e.hotel} · ${e.perfil_entrevistado || 's/perfil'} · ${e.fecha}</span><span class="pill">${e.score_general !== null ? e.score_general + '%' : 's/d'}</span>`;
+    const syncBadge = e.synced === false
+      ? '<span style="display:block;font-size:.68rem;color:var(--red);font-weight:700;margin-top:2px;">⚠ no sincronizada</span>'
+      : '';
+    row.innerHTML = `<span>${e.hotel} · ${e.perfil_entrevistado || 's/perfil'} · ${e.fecha}${syncBadge}</span><span class="pill">${e.score_general !== null ? e.score_general + '%' : 's/d'}</span>`;
     container.appendChild(row);
   });
 }
@@ -811,9 +829,10 @@ document.getElementById("btn-guardar").addEventListener("click", async () => {
     created_at: new Date().toISOString()
   };
 
-  // Guardar siempre localmente primero (resiliencia offline)
+  // Guardar siempre localmente primero (resiliencia offline), con metadata de sincronización
+  const localId = "loc_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
   const local = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
-  local.push(entry);
+  local.push({ ...entry, _local_id: localId, synced: false });
   localStorage.setItem("maintainx_entries", JSON.stringify(local));
   renderEntries();
 
@@ -821,18 +840,76 @@ document.getElementById("btn-guardar").addEventListener("click", async () => {
     try {
       const { error } = await supabaseClient.from(SUPABASE_TABLE).insert([entry]);
       if (error) throw error;
+      markLocalSynced(localId);
       showStatus("Ficha guardada y sincronizada con Supabase.", "ok");
     } catch (err){
       console.error(err);
-      showStatus("Guardada localmente. No se pudo sincronizar con Supabase (revisar conexión/tabla).", "local");
+      showStatus("Guardada localmente. No se pudo sincronizar con Supabase — usa \"Reintentar sincronización\" más abajo cuando tengas mejor conexión.", "local");
     }
   } else {
     showStatus("Guardada localmente. Configura SUPABASE_ANON_KEY para sincronizar.", "local");
   }
+  renderEntries();
   loadHotelAverages();
   showReportActions(entry);
   resetFormForNextProfile();
 });
+
+function markLocalSynced(localId){
+  const local = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
+  const idx = local.findIndex(e => e._local_id === localId);
+  if (idx !== -1){
+    local[idx].synced = true;
+    localStorage.setItem("maintainx_entries", JSON.stringify(local));
+  }
+}
+
+async function retrySync(){
+  if (!supabaseClient){
+    showStatus("No se puede sincronizar: falta configurar SUPABASE_ANON_KEY en este archivo.", "err");
+    return;
+  }
+  const local = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
+  const pending = local.filter(e => !e.synced);
+  if (!pending.length){
+    showStatus("No hay fichas pendientes por sincronizar.", "ok");
+    return;
+  }
+  const btn = document.getElementById("btn-retry-sync");
+  btn.disabled = true;
+  btn.textContent = "Sincronizando…";
+  let okCount = 0, failCount = 0;
+  for (const rec of pending){
+    const { _local_id, synced, ...payload } = rec;
+    // Fichas guardadas antes de este cambio no tienen _local_id: se les asigna uno para poder marcarlas.
+    const idToUse = _local_id || ("legacy_" + payload.hotel + "_" + payload.fecha + "_" + payload.perfil_entrevistado);
+    if (!_local_id){
+      const all = JSON.parse(localStorage.getItem("maintainx_entries") || "[]");
+      const idx = all.findIndex(e => !e._local_id && e.hotel === payload.hotel && e.fecha === payload.fecha && e.perfil_entrevistado === payload.perfil_entrevistado && e.created_at === payload.created_at);
+      if (idx !== -1){ all[idx]._local_id = idToUse; localStorage.setItem("maintainx_entries", JSON.stringify(all)); }
+    }
+    try {
+      const { error } = await supabaseClient.from(SUPABASE_TABLE).insert([payload]);
+      if (error) throw error;
+      markLocalSynced(idToUse);
+      okCount++;
+    } catch (err){
+      console.error("Fallo reintentando", idToUse, err);
+      failCount++;
+    }
+  }
+  btn.disabled = false;
+  btn.textContent = "🔄 Reintentar sincronización";
+  renderEntries();
+  loadHotelAverages();
+  if (failCount === 0){
+    showStatus(`${okCount} ficha(s) sincronizada(s) correctamente.`, "ok");
+  } else {
+    showStatus(`${okCount} sincronizada(s), ${failCount} siguen fallando. Revisa tu conexión e inténtalo de nuevo.`, "local");
+  }
+}
+
+document.getElementById("btn-retry-sync").addEventListener("click", retrySync);
 
 // ==================== Generación de informe (PDF / Word) ====================
 let lastSavedEntry = null;
